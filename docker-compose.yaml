@@ -1,0 +1,54 @@
+# Only for local development, useful for creating a local database
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16.1
+    ports:
+      - 15432:5432
+    restart: on-failure
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: sentinel
+      POSTGRES_PASSWORD: sentinel
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: sentinel
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "sentinel", "-d", "sentinel"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  waitfor-postgres:
+    image: dadarek/wait-for-dependencies:0.2
+    depends_on:
+      - postgres
+    command: postgres:5432
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sentinel_api
+    environment:
+      ENV: production
+      DATABASE_URL: postgresql+psycopg2://sentinel:sentinel@postgres:5432/sentinel
+      API_PORT: 10101
+      API_HOST: 0.0.0.0
+      API_VALID_API_KEY: hi
+      SERVER_STRUCTURED: false
+    depends_on:
+      waitfor-postgres:
+        condition: service_completed_successfully
+    ports:
+      - 10101:10101
+    entrypoint: "/app/docker-entrypoint.sh server"
+    healthcheck:
+      test: "curl -f http://localhost:$$API_PORT/healthcheck"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  postgres-data:

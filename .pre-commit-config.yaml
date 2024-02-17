@@ -1,0 +1,55 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks.git
+    rev: v4.3.0
+    hooks:
+    - id: trailing-whitespace
+    - id: check-merge-conflict
+    - id: check-toml
+    - id: debug-statements
+    - id: check-json
+    - id: check-toml
+    - id: detect-private-key
+-   repo: local
+    hooks:
+    - id: pycln
+      name: pycln
+      entry: bash -c 'poetry run pycln sentinel tests'
+      language: system
+      types:
+        - python
+    - id: pylint
+      name: pylint
+      entry: bash -c 'poetry run pylint sentinel tests'
+      language: system
+      types:
+        - python
+    - id: black
+      name: black
+      entry: bash -c 'poetry run black sentinel tests'
+      language: system
+      types:
+        - python
+    - id: isort
+      name: isort
+      entry: bash -c 'poetry run isort sentinel tests'
+      language: system
+      types:
+        - python
+    - id: mypy
+      name: mypy
+      entry: bash -c 'poetry run mypy sentinel'
+      language: system
+      types:
+        - python
+      exclude: tests/*
+    - id: pytest
+      name: pytest
+      language: system
+      entry: bash -c 'poetry run pytest'
+      types: [python]
+      stages: [push]
+      pass_filenames: false
+    - id: bandit
+      name: bandit
+      language: system
+      entry: bash -c 'poetry run bandit -c pyproject.toml sentinel'

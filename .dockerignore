@@ -1,0 +1,7 @@
+.github
+deploy
+docs
+notebooks
+settings.ini
+.venv
+docker-compose.yaml
