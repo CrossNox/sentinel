@@ -1,18 +1,18 @@
 """Common code undeserving of its own module."""
 
-import functools
 import logging
+import functools
 from typing import Union
 
 import typer
 from pythonjsonlogger import jsonlogger
+
 from sentinel.config import cfg
-from sentinel.constants import (DEFAULT_PRETTY,
-                                                     DEFAULT_STRUCTURED,
-                                                     DEFAULT_VERBOSE)
+from sentinel.constants import DEFAULT_PRETTY, DEFAULT_VERBOSE, DEFAULT_STRUCTURED
 
 DEFAULT_PRETTY = False
 DEFAULT_VERBOSE = 0
+
 
 def to_bool(s: Union[str, bool]):
     if isinstance(s, bool):
@@ -25,6 +25,7 @@ def to_bool(s: Union[str, bool]):
         return False
 
     raise ValueError(f"Invalid value for bool: {s}")
+
 
 class TyperLoggerHandler(logging.Handler):
     """Logging handler that works well with typer."""
@@ -55,11 +56,10 @@ class TyperLoggerHandler(logging.Handler):
         typer.secho(self.format(record), bg=background, fg=foreground)
 
 
-
 def config_once(f):
     """Decorator to force config_logging to be called just once.
 
-    If you run the server from the clerk CLI, config_logging will be called twice:
+    If you run the server from the sentinel CLI, config_logging will be called twice:
     - First from the main callback on the CLI
         - This takes YCM config to populate defaults
         - Then uses whatever values you passed
